@@ -84,7 +84,14 @@ object List { // `List` companion object. Contains functions for creating and wo
   def length[A](l: List[A]): Int =
     foldRight(l, 0)((_, acc) => acc + 1)
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  @annotation.tailrec
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil => z
+    case Cons(h, t) => foldLeft(t, f(z, h))(f)
+  }
+
+  def reverse[A](l: List[A]): List[A] =
+    foldLeft(l, List[A]())((rev, h) => Cons(h, rev))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
 }
@@ -94,6 +101,9 @@ object ListTests extends App {
   println(List.tail(xs))
   println(List.setHead(xs, 10))
   println(List.drop(xs, 2))
+  println(List.foldLeft(xs, 0)(_+_))
+  println(List.foldLeft(xs, 0)((acc, _) => acc + 1))
+  println(List.reverse(xs))
 
   val ys = List(1, 3, 5, 7, 8, 2, 10)
   println(List.dropWhile(ys)(a => (a % 2) == 1))
